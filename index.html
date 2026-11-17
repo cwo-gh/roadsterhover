@@ -2,11 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Roadster Hover</title>
     <style>
         * {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html, body {
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            overscroll-behavior: none;
         }
         body {
             display: flex;
@@ -39,6 +45,7 @@
             box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 30px rgba(56, 189, 248, 0.12);
             cursor: pointer;
             touch-action: none;
+            -webkit-touch-callout: none;
             display: block;
         }
         .controls-hint {
