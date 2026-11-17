@@ -658,41 +658,62 @@ function drawScoreHUD() {
 }
 
 function drawTopBadges() {
+    const pillY = 12;
+    const pillH = 24;
+    const centerY = pillY + pillH / 2;
+
     // Left badge: Cold-Gas Thruster Status
     ctx.save();
     const active = thrustLevel > 0.25;
+    const thrustLabel = 'Thrust';
+    ctx.font = '700 10px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    const thrustTextW = ctx.measureText(thrustLabel).width;
+    const dotR = 3.2;
+    const dotGap = 6;
+    const padX = 11;
+    const leftPillW = Math.ceil(padX * 2 + dotR * 2 + dotGap + thrustTextW);
+
     ctx.fillStyle = active ? 'rgba(14, 165, 233, 0.28)' : 'rgba(15, 23, 42, 0.72)';
     ctx.strokeStyle = active ? '#38bdf8' : '#334155';
     ctx.lineWidth = 1.2;
-    roundedRectPath(12, 12, 118, 24, 12);
+    roundedRectPath(12, pillY, leftPillW, pillH, pillH / 2);
     ctx.fill();
     ctx.stroke();
 
+    const dotX = 12 + padX + dotR;
     ctx.fillStyle = active ? '#38bdf8' : '#94a3b8';
     ctx.beginPath();
-    ctx.arc(24, 24, 3.5, 0, Math.PI * 2);
+    ctx.arc(dotX, centerY, dotR, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.font = '700 10px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#e2e8f0';
-    ctx.fillText('COLD-GAS 10K PSI', 32, 24.5);
+    ctx.fillText(thrustLabel, dotX + dotR + dotGap, centerY + 0.5);
     ctx.restore();
 
     // Right badge: Sound Mute Toggle
     ctx.save();
-    ctx.font = '600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'top';
+    ctx.font = '600 11.5px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    const soundLabel = muted ? 'Muted' : 'Sound On';
+    const maxSoundW = Math.max(
+        ctx.measureText('Sound On').width,
+        ctx.measureText('Muted').width
+    );
+    const rightPillW = Math.ceil(maxSoundW) + 24;
+    const rightPillX = GAME_WIDTH - 12 - rightPillW;
+
     ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
     ctx.strokeStyle = '#334155';
     ctx.lineWidth = 1.2;
-    roundedRectPath(GAME_WIDTH - 78, 12, 66, 24, 12);
+    roundedRectPath(rightPillX, pillY, rightPillW, pillH, pillH / 2);
     ctx.fill();
     ctx.stroke();
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
     ctx.fillStyle = '#f8fafc';
-    ctx.fillText(muted ? 'Muted' : 'Sound On', GAME_WIDTH - 22, 18);
+    ctx.fillText(soundLabel, rightPillX + rightPillW / 2, centerY + 0.5);
     ctx.restore();
 }
 
@@ -1001,7 +1022,7 @@ canvas.addEventListener('pointerdown', (e) => {
     const clickY = (e.clientY - rect.top) * scaleY;
 
     // Mute badge click
-    if (clickX >= GAME_WIDTH - 82 && clickY <= 40) {
+    if (clickX >= GAME_WIDTH - 96 && clickY <= 44) {
         muted = !muted;
         if (muted) updateThrusterAudio(false);
         return;
@@ -1010,6 +1031,13 @@ canvas.addEventListener('pointerdown', (e) => {
     pointerHeld = true;
     handleStartOrRestart();
 });
+
+// Prevent mobile double-tap zoom and pinch-zoom while tapping rapidly
+canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+canvas.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+canvas.addEventListener('touchend', (e) => e.preventDefault(), { passive: false });
+canvas.addEventListener('dblclick', (e) => e.preventDefault());
+document.addEventListener('gesturestart', (e) => e.preventDefault());
 
 window.addEventListener('pointerup', () => {
     pointerHeld = false;
